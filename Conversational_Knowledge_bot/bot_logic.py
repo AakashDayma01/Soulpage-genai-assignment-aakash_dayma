@@ -19,19 +19,19 @@ current_entity = None
 chat_prompt = PromptTemplate(
     input_variables=["history", "input"],
     template="""
-You are a conversational assistant.
+        You are a conversational assistant.
 
-Rules:
-- Keep replies short
-- No explanations unless asked
-- Respond naturally
+        Rules:
+        - Keep replies short
+        - No explanations unless asked
+        - Respond naturally
 
-Conversation:
-{history}
+        Conversation:
+        {history}
 
-User: {input}
-Assistant:
-"""
+        User: {input}
+        Assistant:
+    """
 )
 conversation = ConversationChain(llm=llm, memory=memory, prompt=chat_prompt, verbose=False)
 
