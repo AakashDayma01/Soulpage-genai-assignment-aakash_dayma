@@ -37,30 +37,30 @@ conversation = ConversationChain(llm=llm, memory=memory, prompt=chat_prompt, ver
 
 def detect_intent(text: str) -> str:
     prompt = f"""
-Classify the user message into ONE word only.
+        Classify the user message into ONE word only.
 
-Rules:
-- small_talk → greetings, wishes, casual chat, emotions
-- factual → asking for information or facts
+        Rules:
+        - small_talk → greetings, wishes, casual chat, emotions
+        - factual → asking for information or facts
 
-Message:
-{text}
+        Message:
+        {text}
 
-Answer only one word: small_talk or factual
-"""
+        Answer only one word: small_talk or factual
+    """
     response = llm.invoke([HumanMessage(content=prompt)])
     return response.content.strip().lower()
 
 def extract_entity(text: str) -> str | None:
     prompt = f"""
-Extract the MAIN person or company name from the message.
-If none is mentioned, return NONE.
+        Extract the MAIN person or company name from the message.
+        If none is mentioned, return NONE.
 
-Message:
-{text}
+        Message:
+        {text}
 
-Answer ONLY the name or NONE.
-"""
+        Answer ONLY the name or NONE.
+    """
     response = llm.invoke([HumanMessage(content=prompt)])
     result = response.content.strip()
     return None if result.upper() == "NONE" else result
@@ -77,16 +77,16 @@ def rewrite_question(user_query: str, entity: str | None) -> str:
     if not entity:
         return user_query
     prompt = f"""
-Rewrite the question to be fully standalone using the context below.
+        Rewrite the question to be fully standalone using the context below.
 
-Context entity:
-{entity}
+        Context entity:
+        {entity}
 
-User question:
-{user_query}
+        User question:
+        {user_query}
 
-Return ONLY the rewritten question.
-"""
+        Return ONLY the rewritten question.
+    """
     response = llm.invoke([HumanMessage(content=prompt)])
     return response.content.strip()
 
@@ -117,19 +117,19 @@ def verify_answer(user_query: str, llm_answer: str) -> str:
         return llm_answer
     else:
         prompt = f"""
-You are a factual assistant.
+            You are a factual assistant.
 
-Check the answer below against the information provided. 
-If the answer is correct, return it. If wrong, generate correct answer.
+            Check the answer below against the information provided. 
+            If the answer is correct, return it. If wrong, generate correct answer.
 
-LLM Answer:
-{llm_answer}
+            LLM Answer:
+            {llm_answer}
 
-Information:
-{snippets}
+            Information:
+            {snippets}
 
-Return ONLY the correct answer.
-"""
+            Return ONLY the correct answer.
+        """
         response = llm.invoke([HumanMessage(content=prompt)])
         return response.content.strip()
 
@@ -150,14 +150,14 @@ def get_bot_response(user_input: str) -> str:
 
     rewritten = rewrite_question(user_input, current_entity)
     llm_answer_prompt = f"""
-    Answer the question concisely and factually.
+        Answer the question concisely and factually.
 
-    Rules:
-    - Do NOT include extra titles, nicknames, or historical roles.
-    - Only provide the plain factual answer based on public information.
+        Rules:
+        - Do NOT include extra titles, nicknames, or historical roles.
+        - Only provide the plain factual answer based on public information.
 
-    Question: {rewritten}
-"""
+        Question: {rewritten}
+    """
     llm_answer = llm.invoke([HumanMessage(content=llm_answer_prompt)]).content.strip()
     final_answer = verify_answer(rewritten, llm_answer)
     memory.save_context({"input": user_input}, {"output": final_answer})
@@ -192,13 +192,13 @@ if __name__ == "__main__":
 
         # Let LLM answer first
         llm_answer_prompt = f"""
-        Answer the question concisely and factually.
+            Answer the question concisely and factually.
 
-        Rules:
-        - Do NOT include extra titles, nicknames, or historical roles.
-        - Only provide the plain factual answer based on public information.
+            Rules:
+            - Do NOT include extra titles, nicknames, or historical roles.
+            - Only provide the plain factual answer based on public information.
 
-        Question: {rewritten}
+            Question: {rewritten}
         """
         llm_answer = llm.invoke([HumanMessage(content=llm_answer_prompt)]).content.strip()
 
